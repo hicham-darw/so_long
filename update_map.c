@@ -1,7 +1,7 @@
 #include "libso_long.h"
 #include <stdlib.h>
 
-char	**update_map(char **map, int next_px, int next_py)
+char	**update_map(char **map, int *px, int *py, int key)
 {
 	int	i;
 	char	*pl;
@@ -14,7 +14,14 @@ char	**update_map(char **map, int next_px, int next_py)
 		if (pl = ft_strchr(map[i], 'P'))
 		{
 			*pl = '0';
-			map[next_py][next_px] = 'P';
+			if (key == 'A' || key == 'a')
+				map[*py][--*px] = 'P';
+			else if (key == 'W' || key == 'w')
+				map[--*py][*px] = 'P';
+			else if (key == 'D' || key == 'd')
+				map[*py][++*px] = 'P';
+			else
+				map[++*py][*px] = 'P';
 			break;
 		}
 		i++;
