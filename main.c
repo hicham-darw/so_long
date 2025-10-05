@@ -11,7 +11,7 @@ int	main(int ac, char **av)
 	void	*mlx, *new_win;
 	t_allvars allvars;
 
-	t_data_img s_data_img[5] /*d_data_img[5]*/;
+	t_data_img s_data_img[6] ,d_data_img[5];
 	int	window_sx, window_sy;
 	int	wall_width, wall_height, floor_width, floor_height, jewellery_width, jewellery_height, exit_width, exit_height, player_width, player_height;
 	char	**map;
@@ -67,7 +67,7 @@ int	main(int ac, char **av)
 	*@param 3: height of window
 	*@param 4: window title
 	*/
-	window_sx = 960;
+	window_sx = 700;
 	window_sy = 500;
 	new_win = mlx_new_window(mlx, window_sx, window_sy, "DARWIN");
 	if (!new_win)
@@ -87,7 +87,7 @@ int	main(int ac, char **av)
 	int i = 0;
 	while (i < 5)
 	{
-		fill_container_image(mlx, &s_data_img[i], &allvars.data_img[0], window_sx, window_sy, width_map, height_map);
+		fill_container_image(mlx, &s_data_img[i], &allvars.data_img[i], window_sx, window_sy, width_map, height_map);
 		i++;
 	}
 
@@ -97,15 +97,15 @@ int	main(int ac, char **av)
 		printf("failed allocation: map\n");
 		return (1);
 	}
-	printf("OK!\n");
 	put_map_to_window(mlx, new_win, map, allvars.data_img, window_sx, window_sy);
-	printf("OK!\n");
-	sleep(4);
+
 	allvars.mlx = mlx;
 	allvars.window = new_win;
 	allvars.map = map;
 	allvars.window_sx = window_sx;
 	allvars.window_sy = window_sy;
+	// allvars.exit.exit_x = 0;
+	// allvars.exit.exit_y = 0;
 	if (!get_player_coordinates(allvars.map, &allvars.player.player_x, &allvars.player.player_y))
 	{
 		printf("error: get player (x, y)?\n");
@@ -116,7 +116,7 @@ int	main(int ac, char **av)
 		printf("error: get exit (x, y)?\n");
 		return (1);
 	}
-
+	printf("exit (%d, %d)\n", allvars.exit.exit_x, allvars.exit.exit_y);
 	mlx_key_hook(new_win, key_hook, &allvars);
 	//	mlx_put_image_to_window(mlx, new_win, img.img, 0, 0);
 	mlx_loop(mlx);
@@ -137,64 +137,83 @@ int	key_hook(int keycode, t_allvars *vars)
 	{
 		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == '1')
 			return (1);
-		if (vars->player.player_y == vars->exit.exit_y && (vars->player.player_x - 1) == vars->exit.exit_x)
+		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == 'E')
 		{
-			printf("*********\n*You Win*\n*********\n");
-			return (-1);
+			if (found_collectibles(vars->map))
+				return (1);
+			else
+			{
+				printf("*********\n*You Win*\n*********\n");
+				exit(0);
+			}
+			return (42);
 		}
 		printf("LEFT\n");
-		update_map(vars->map, vars->player.player_x - 1, vars->player.player_y);
+		update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
 		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
 	}
 	else if (keycode == 'W' || keycode == 'w')
 	{
 		if (vars->map[vars->player.player_y - 1][vars->player.player_x] == '1')
 			return (1);
-		if ((vars->player.player_y - 1) == vars->exit.exit_y && vars->player.player_x == vars->exit.exit_x)
+		if (vars->map[vars->player.player_y - 1][vars->player.player_x] == 'E')
 		{
-			printf("*********\n*You Win*\n*********\n");
-			return (-1);
+			if (found_collectibles(vars->map))
+				return (1);
+			else
+			{
+				printf("*********\n*You Win*\n*********\n");
+				exit(0);
+			}
+			return (42);
 		}
-		update_map(vars->map, vars->player.player_x, vars->player.player_y - 1);
+		update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
 		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
-
 		printf("UP\n");
-
 	}
 	else if (keycode == 'D' || keycode == 'd')
 	{
 		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == '1')
 			return (1);
-		if (vars->player.player_y == vars->exit.exit_y && (vars->player.player_x + 1) == vars->exit.exit_x)
+		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == 'E')
 		{
-			printf("*********\n*You Win*\n*********\n");
-			return (-1);
+			if (found_collectibles(vars->map))
+				return (1);
+			else
+			{
+				printf("*********\n*You Win*\n*********\n");
+				exit(0);
+			}
+			return (42);
 		}
-		update_map(vars->map, vars->player.player_x + 1, vars->player.player_y);
+		update_map(vars->map, &vars->player.player_x , &vars->player.player_y, keycode);
 		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
-
-
 		printf("RIGHT\n");
-
 	}
 	else if (keycode == 'S' || keycode == 's')
 	{
 		if (vars->map[vars->player.player_y + 1][vars->player.player_x] == '1')
 			return (1);
-		if ((vars->player.player_y + 1) == vars->exit.exit_y && vars->player.player_x == vars->exit.exit_x);
+		if (vars->map[vars->player.player_y + 1][vars->player.player_x] == 'E')
 		{
-			printf("*********\n*You Win*\n*********\n");
-			return (-1);
+			if (found_collectibles(vars->map))
+				return (1);
+			else
+			{
+				printf("*********\n*You Win*\n*********\n");
+				exit(0);
+			}
+			return (42);
 		}
-		update_map(vars->map, vars->player.player_x, vars->player.player_y + 1);
+		update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
 		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
-
 		printf("DOWN\n");
-
 	}
 	else
 	{
-		printf("invalide key!");
+		if (keycode == 65307)
+			exit(0);
+		printf("keycode => %d\n", keycode);
 		return (1);
 	}
 	return (0);
