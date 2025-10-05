@@ -21,7 +21,7 @@ int		put_map_to_window(void *mlx, void *new_win, char **map, t_data_img *dst_img
 		while (map[i][j])
 		{
 			if (map[i][j] == '1')
-				mlx_put_image_to_window(mlx, new_win, dst_img[1].img, (window_sx / width_map) * j, (window_sy / height_map) * i);
+				mlx_put_image_to_window(mlx, new_win, (dst_img + 1)->img, (window_sx / width_map) * j, (window_sy / height_map) * i);
 			else if (map[i][j] == '0')
 				mlx_put_image_to_window(mlx, new_win, dst_img[0].img, (window_sx / width_map) * j, (window_sy / height_map) * i);
 			else if (map[i][j] == 'P')
