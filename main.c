@@ -3,19 +3,29 @@
 #include "libso_long.h"
 #include <stdlib.h>
 #include "gnl/get_next_line.h"
+#include <stdio.h>
+
 
 int	main(int ac, char **av)
 {
 	void	*mlx, *new_win;
-	t_data_img s_wall_img, s_floor_img, d_wall_img, d_floor_img, s_jewellery_img, d_jewellery_img, s_exit_img, d_exit_img, s_player_img, d_player_img;
+	t_allvars allvars;
+
+	t_data_img s_data_img[5] /*d_data_img[5]*/;
 	int	window_sx, window_sy;
 	int	wall_width, wall_height, floor_width, floor_height, jewellery_width, jewellery_height, exit_width, exit_height, player_width, player_height;
+	char	**map;
 
 	if (ac != 2)
 	{
 		printf("Usage: ./program_name file.ber\n");
 		exit(EXIT_FAILURE);
 	}
+	s_data_img[0].xpm_file = ft_strdup("textures/floor.xpm");
+	s_data_img[1].xpm_file = ft_strdup("textures/wall.xpm");
+	s_data_img[2].xpm_file = ft_strdup("textures/jewellery.xpm");
+	s_data_img[3].xpm_file = ft_strdup("textures/exit.xpm");
+	s_data_img[4].xpm_file = ft_strdup("textures/player.xpm");
 
 	//read file .ber
 	//open file.ber
@@ -30,7 +40,6 @@ int	main(int ac, char **av)
 	height_map = 0;
 	while (get_next_line(fd, &line_map) > 0)
 	{
-		printf("%s\n", line_map);
 		width_map = strlen(line_map);
 		height_map += 1;
 	}
@@ -75,93 +84,40 @@ int	main(int ac, char **av)
 	*@param 2: width image
 	*@param 3: height image
 	*/
-	// container wall image && address buffer
-	d_wall_img.img = mlx_new_image(mlx, window_sx / width_map, window_sy / height_map);
-	d_wall_img.addr = mlx_get_data_addr(d_wall_img.img, &d_wall_img.bpp, &d_wall_img.line_length, &d_wall_img.endian);
-	// container floor image && address buffer
-	d_floor_img.img = mlx_new_image(mlx, window_sx / width_map, window_sy / height_map);
-	d_floor_img.addr = mlx_get_data_addr(d_floor_img.img, &d_floor_img.bpp, &d_floor_img.line_length, &d_floor_img.endian);
-	// container player image && addr buffer
-	d_player_img.img = mlx_new_image(mlx, window_sx / width_map, window_sy / height_map);
-	d_player_img.addr = mlx_get_data_addr(d_player_img.img, &d_player_img.bpp, &d_player_img.line_length, &d_player_img.endian);
-	// container collectible image
-	d_jewellery_img.img = mlx_new_image(mlx, window_sx / width_map, window_sy / height_map);
-	d_jewellery_img.addr = mlx_get_data_addr(d_jewellery_img.img, &d_jewellery_img.bpp, &d_player_img.line_length, &d_player_img.endian);
-	// containet exit image
-	d_exit_img.img = mlx_new_image(mlx, window_sx / width_map, window_sy / height_map);
-	d_exit_img.addr = mlx_get_data_addr(d_exit_img.img, &d_exit_img.bpp, &d_exit_img.line_length, &d_exit_img.endian);
-
-
-	// get xpm file wall image
-	s_wall_img.img = mlx_xpm_file_to_image(mlx, "textures/wall.xpm", &wall_width, &wall_height);
-	s_wall_img.addr = mlx_get_data_addr(s_wall_img.img, &s_wall_img.bpp, &s_wall_img.line_length, &s_wall_img.endian);
-	// get xpm file floor image
-	s_floor_img.img = mlx_xpm_file_to_image(mlx, "textures/floor.xpm", &floor_width, &floor_height);
-	s_floor_img.addr = mlx_get_data_addr(s_floor_img.img, &s_floor_img.bpp, &s_floor_img.line_length, &s_wall_img.endian);
-	// get xpm file player image
-	s_player_img.img = mlx_xpm_file_to_image(mlx, "textures/player.xpm", &player_width, &player_height);
-	s_player_img.addr = mlx_get_data_addr(s_player_img.img, &s_player_img.bpp, &s_player_img.line_length, &s_player_img.endian);
-	// get xpm file jewellery image
-	s_jewellery_img.img = mlx_xpm_file_to_image(mlx, "textures/jewellery.xpm", &jewellery_width, &jewellery_height);
-	s_jewellery_img.addr = mlx_get_data_addr(s_jewellery_img.img, &s_jewellery_img.bpp, &s_jewellery_img.line_length, &s_jewellery_img.endian);
-	// get xpm file exit image
-	s_exit_img.img = mlx_xpm_file_to_image(mlx, "textures/exit.xpm", &exit_width, &exit_height);
-	s_exit_img.addr = mlx_get_data_addr(s_exit_img.img, &s_exit_img.bpp, &s_exit_img.line_length, &s_exit_img.endian);
-
-
-	int	i, j, src_x, src_y;
-	char	*src_pixel, *dst_pixel;
-	i = 0;
-	while (i < (window_sy / height_map))
+	int i = 0;
+	while (i < 5)
 	{
-		j = 0;
-		while (j < (window_sx / width_map))
-		{
-			src_x = (j * floor_width) / (window_sx / width_map);
-			src_y = (i * floor_height) / (window_sy / height_map);
-
-			src_pixel = s_floor_img.addr + (src_y * s_floor_img.line_length) + (src_x * (s_floor_img.bpp / 8));
-			dst_pixel = d_floor_img.addr + (i * d_floor_img.line_length) + (j * (d_floor_img.bpp / 8));
-			
-			*(unsigned int *)dst_pixel = *(unsigned int *)src_pixel;
-			j++;
-		}
+		fill_container_image(mlx, &s_data_img[i], &allvars.data_img[0], window_sx, window_sy, width_map, height_map);
 		i++;
 	}
 
-	i = 0;
-	while (i < (window_sy / height_map))
+	map = get_map(av[1], height_map);
+	if (!map)
 	{
-		j = 0;
-		while (j < (window_sx / width_map))
-		{
-			src_x = (j * wall_width) / (window_sx / width_map);
-			src_y = (i * wall_height) / (window_sy / height_map);
-
-			src_pixel = s_wall_img.addr + (src_y * s_wall_img.line_length) + (src_x * (s_wall_img.bpp / 8));
-			dst_pixel = d_wall_img.addr + (i * d_wall_img.line_length) + (j * (d_wall_img.bpp / 8));
-			
-			*(unsigned int *)dst_pixel = *(unsigned int *)src_pixel;
-			j++;
-		}
-		i++;
+		printf("failed allocation: map\n");
+		return (1);
+	}
+	printf("OK!\n");
+	put_map_to_window(mlx, new_win, map, allvars.data_img, window_sx, window_sy);
+	printf("OK!\n");
+	sleep(4);
+	allvars.mlx = mlx;
+	allvars.window = new_win;
+	allvars.map = map;
+	allvars.window_sx = window_sx;
+	allvars.window_sy = window_sy;
+	if (!get_player_coordinates(allvars.map, &allvars.player.player_x, &allvars.player.player_y))
+	{
+		printf("error: get player (x, y)?\n");
+		return (1);
+	}
+	if (!get_exit_coordinates(allvars.map, &allvars.exit.exit_x, &allvars.exit.exit_y))
+	{
+		printf("error: get exit (x, y)?\n");
+		return (1);
 	}
 
-	i = 0;
-	while (i < height_map)
-	{
-		j = 0;
-		while (j < width_map)
-		{
-			if (i == 0 || j == 0 || i == height_map - 1 || j == width_map - 1)
-				mlx_put_image_to_window(mlx, new_win, d_wall_img.img, (window_sx / width_map) * j, (window_sy / height_map) * i);
-			else
-				mlx_put_image_to_window(mlx, new_win, d_floor_img.img, (window_sx / width_map) * j, (window_sy / height_map) * i);
-			j++;
-		}
-		i++;
-	}
-
+	mlx_key_hook(new_win, key_hook, &allvars);
 	//	mlx_put_image_to_window(mlx, new_win, img.img, 0, 0);
 	mlx_loop(mlx);
 	
@@ -170,5 +126,76 @@ int	main(int ac, char **av)
 	*	params 1: mlx from mlx_init();
 	*	params 2: new_window  from mlx_new_window();
 	*/
+	return (0);
+}
+
+int	key_hook(int keycode, t_allvars *vars)
+{
+	if (!vars)
+		return (1);
+	if (keycode == 'A' || keycode == 'a')
+	{
+		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == '1')
+			return (1);
+		if (vars->player.player_y == vars->exit.exit_y && (vars->player.player_x - 1) == vars->exit.exit_x)
+		{
+			printf("*********\n*You Win*\n*********\n");
+			return (-1);
+		}
+		printf("LEFT\n");
+		update_map(vars->map, vars->player.player_x - 1, vars->player.player_y);
+		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+	}
+	else if (keycode == 'W' || keycode == 'w')
+	{
+		if (vars->map[vars->player.player_y - 1][vars->player.player_x] == '1')
+			return (1);
+		if ((vars->player.player_y - 1) == vars->exit.exit_y && vars->player.player_x == vars->exit.exit_x)
+		{
+			printf("*********\n*You Win*\n*********\n");
+			return (-1);
+		}
+		update_map(vars->map, vars->player.player_x, vars->player.player_y - 1);
+		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+
+		printf("UP\n");
+
+	}
+	else if (keycode == 'D' || keycode == 'd')
+	{
+		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == '1')
+			return (1);
+		if (vars->player.player_y == vars->exit.exit_y && (vars->player.player_x + 1) == vars->exit.exit_x)
+		{
+			printf("*********\n*You Win*\n*********\n");
+			return (-1);
+		}
+		update_map(vars->map, vars->player.player_x + 1, vars->player.player_y);
+		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+
+
+		printf("RIGHT\n");
+
+	}
+	else if (keycode == 'S' || keycode == 's')
+	{
+		if (vars->map[vars->player.player_y + 1][vars->player.player_x] == '1')
+			return (1);
+		if ((vars->player.player_y + 1) == vars->exit.exit_y && vars->player.player_x == vars->exit.exit_x);
+		{
+			printf("*********\n*You Win*\n*********\n");
+			return (-1);
+		}
+		update_map(vars->map, vars->player.player_x, vars->player.player_y + 1);
+		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+
+		printf("DOWN\n");
+
+	}
+	else
+	{
+		printf("invalide key!");
+		return (1);
+	}
 	return (0);
 }
