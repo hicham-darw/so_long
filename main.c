@@ -11,7 +11,7 @@ int	main(int ac, char **av)
 	void	*mlx, *new_win;
 	t_allvars allvars;
 
-	t_data_img s_data_img[6] ,d_data_img[5];
+	t_data_img s_data_img[6];
 	int	window_sx, window_sy;
 	int	wall_width, wall_height, floor_width, floor_height, jewellery_width, jewellery_height, exit_width, exit_height, player_width, player_height;
 	char	**map;
@@ -30,18 +30,18 @@ int	main(int ac, char **av)
 	//read file .ber
 	//open file.ber
 	char	*line_map;
-	int		width_map, height_map;
 	int fd = open(av[1], O_RDONLY);
 	if (fd == -1)
 	{
 		perror("open failed");
 		exit(1);
 	}
-	height_map = 0;
+	allvars.height_map = 0;
 	while (get_next_line(fd, &line_map) > 0)
 	{
-		width_map = strlen(line_map);
-		height_map += 1;
+		allvars.width_map = strlen(line_map);
+		allvars.height_map += 1;
+		free(line_map);
 	}
 	close(fd); // think about how can use maps to put all correct map 
 
@@ -51,8 +51,8 @@ int	main(int ac, char **av)
 	*@return (void *) hold the location of current MLX | NULL if fails
 	*@params (void)
 	*/
-	mlx = mlx_init();
-	if (!mlx)
+	allvars.mlx = mlx_init();
+	if (!allvars.mlx)
 	{
 		printf("connection failed\n");
 		return (1);
@@ -67,10 +67,10 @@ int	main(int ac, char **av)
 	*@param 3: height of window
 	*@param 4: window title
 	*/
-	window_sx = 700;
-	window_sy = 500;
-	new_win = mlx_new_window(mlx, window_sx, window_sy, "DARWIN");
-	if (!new_win)
+	allvars.window_sx = 1920;
+	allvars.window_sy = 1000;
+	allvars.window = mlx_new_window(allvars.mlx, allvars.window_sx, allvars.window_sy, "DARWIN");
+	if (!allvars.window)
 	{
 		printf("can't create new window!\n");
 		return (1);
@@ -87,25 +87,29 @@ int	main(int ac, char **av)
 	int i = 0;
 	while (i < 5)
 	{
-		fill_container_image(mlx, &s_data_img[i], &allvars.data_img[i], window_sx, window_sy, width_map, height_map);
+		if (i == 0)
+			fill_container_image(allvars.mlx, &s_data_img[i], &allvars.data_img[i], allvars.window_sx, allvars.window_sy, allvars.width_map, allvars.height_map);
+		else
+			fill_container_with_grass(allvars.mlx, &s_data_img[0], &s_data_img[i], &allvars.data_img[i], allvars.window_sx, allvars.window_sy, allvars.width_map, allvars.height_map);
 		i++;
 	}
 
-	map = get_map(av[1], height_map);
-	if (!map)
+	//reverse image player
+	// allvars.player.reverse_player = 1;
+	// printf("%s\n", allvars.data_img[4].addr);
+	// change_direction_player(&allvars);
+
+	// printf("%s\n", allvars.data_img[4].addr);
+	// printf("*****************************\n");
+
+	allvars.map = get_map(av[1], allvars.height_map);
+	if (!allvars.map)
 	{
 		printf("failed allocation: map\n");
 		return (1);
 	}
-	put_map_to_window(mlx, new_win, map, allvars.data_img, window_sx, window_sy);
+	put_map_to_window(allvars.mlx, allvars.window, allvars.map, allvars.data_img, allvars.window_sx, allvars.window_sy);
 
-	allvars.mlx = mlx;
-	allvars.window = new_win;
-	allvars.map = map;
-	allvars.window_sx = window_sx;
-	allvars.window_sy = window_sy;
-	// allvars.exit.exit_x = 0;
-	// allvars.exit.exit_y = 0;
 	if (!get_player_coordinates(allvars.map, &allvars.player.player_x, &allvars.player.player_y))
 	{
 		printf("error: get player (x, y)?\n");
@@ -116,10 +120,12 @@ int	main(int ac, char **av)
 		printf("error: get exit (x, y)?\n");
 		return (1);
 	}
+
+
 	printf("exit (%d, %d)\n", allvars.exit.exit_x, allvars.exit.exit_y);
-	mlx_key_hook(new_win, key_hook, &allvars);
+	mlx_key_hook(allvars.window, key_hook, &allvars);
 	//	mlx_put_image_to_window(mlx, new_win, img.img, 0, 0);
-	mlx_loop(mlx);
+	mlx_loop(allvars.mlx);
 	
 	/* prototype mlx_clear_window(t_xvar *xvar, t_win_list *win)
 	* 	return (int) ---> boolean maybe
@@ -133,6 +139,7 @@ int	key_hook(int keycode, t_allvars *vars)
 {
 	if (!vars)
 		return (1);
+	
 	if (keycode == 'A' || keycode == 'a')
 	{
 		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == '1')
