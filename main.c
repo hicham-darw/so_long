@@ -8,13 +8,8 @@
 
 int	main(int ac, char **av)
 {
-	void	*mlx, *new_win;
 	t_allvars allvars;
-
 	t_data_img s_data_img[6];
-	int	window_sx, window_sy;
-	int	wall_width, wall_height, floor_width, floor_height, jewellery_width, jewellery_height, exit_width, exit_height, player_width, player_height;
-	char	**map;
 
 	if (ac != 2)
 	{
@@ -97,7 +92,6 @@ int	main(int ac, char **av)
 	//reverse image player
 	// allvars.player.reverse_player = 1;
 	// printf("%s\n", allvars.data_img[4].addr);
-	// change_direction_player(&allvars);
 
 	// printf("%s\n", allvars.data_img[4].addr);
 	// printf("*****************************\n");
@@ -108,7 +102,7 @@ int	main(int ac, char **av)
 		printf("failed allocation: map\n");
 		return (1);
 	}
-	put_map_to_window(allvars.mlx, allvars.window, allvars.map, allvars.data_img, allvars.window_sx, allvars.window_sy);
+	put_map_to_window(&allvars);
 
 	if (!get_player_coordinates(allvars.map, &allvars.player.player_x, &allvars.player.player_y))
 	{
@@ -120,6 +114,11 @@ int	main(int ac, char **av)
 		printf("error: get exit (x, y)?\n");
 		return (1);
 	}
+    printf("line_length: %d\n", allvars.data_img[4].line_length);
+    printf("bpp        : %d\n", allvars.data_img[4].bpp);
+    printf("xpm width  : %d\n", allvars.data_img[4].xpm_width);
+
+	change_direction_player(&allvars);
 
 
 	printf("exit (%d, %d)\n", allvars.exit.exit_x, allvars.exit.exit_y);
@@ -157,7 +156,7 @@ int	key_hook(int keycode, t_allvars *vars)
 		}
 		printf("LEFT\n");
 		update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
-		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+		put_map_to_window(vars);
 	}
 	else if (keycode == 'W' || keycode == 'w')
 	{
@@ -175,7 +174,7 @@ int	key_hook(int keycode, t_allvars *vars)
 			return (42);
 		}
 		update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
-		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+		put_map_to_window(vars);
 		printf("UP\n");
 	}
 	else if (keycode == 'D' || keycode == 'd')
@@ -194,7 +193,7 @@ int	key_hook(int keycode, t_allvars *vars)
 			return (42);
 		}
 		update_map(vars->map, &vars->player.player_x , &vars->player.player_y, keycode);
-		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+		put_map_to_window(vars);
 		printf("RIGHT\n");
 	}
 	else if (keycode == 'S' || keycode == 's')
@@ -213,7 +212,7 @@ int	key_hook(int keycode, t_allvars *vars)
 			return (42);
 		}
 		update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
-		put_map_to_window(vars->mlx, vars->window, vars->map, vars->data_img, vars->window_sx, vars->window_sy);
+		put_map_to_window(vars);
 		printf("DOWN\n");
 	}
 	else
