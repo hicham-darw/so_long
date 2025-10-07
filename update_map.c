@@ -11,7 +11,7 @@ char	**update_map(char **map, int *px, int *py, int key)
 	i = 0;
 	while (map[i])
 	{
-		if (pl = ft_strchr(map[i], 'P'))
+		if ((pl = ft_strchr(map[i], 'P')))
 		{
 			*pl = '0';
 			if (key == 'A' || key == 'a')
