@@ -31,8 +31,6 @@ void	fill_container_with_grass(void *mlx,t_data_img *floor_img, t_data_img *s_im
                 floor_x = (j * floor_img->xpm_width) / (window_sx / width_map);
                 floor_y = (i * floor_img->xpm_height) / (window_sy / height_map);
                 floor_pixel = floor_img->addr + (floor_y * floor_img->line_length) + (floor_x * (floor_img->bpp / 8));
-			    if (i == 0 && j == 0)
-            	    printf("floor_img :pixel[%d][%d]: %X\n",i, j, *(unsigned int *)floor_pixel);
                 *(unsigned int *)dst_pixel = *(unsigned int *)floor_pixel;
             }
             else
