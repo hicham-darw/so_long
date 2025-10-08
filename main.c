@@ -10,12 +10,15 @@ int	main(int ac, char **av)
 {
 	t_allvars allvars;
 	t_data_img s_data_img[6];
+	char	*line_map;
+	int		fd, i;
 
 	if (ac != 2)
 	{
 		printf("Usage: ./program_name file.ber\n");
 		exit(EXIT_FAILURE);
 	}
+	//invalid map function here!!!!
 	s_data_img[0].xpm_file = ft_strdup("textures/floor.xpm");
 	s_data_img[1].xpm_file = ft_strdup("textures/wall.xpm");
 	s_data_img[2].xpm_file = ft_strdup("textures/jewellery.xpm");
@@ -23,10 +26,7 @@ int	main(int ac, char **av)
 	s_data_img[4].xpm_file = ft_strdup("textures/player_left.xpm");
 	s_data_img[5].xpm_file = ft_strdup("textures/player_right.xpm");
 
-	//read file .ber
-	//open file.ber
-	char	*line_map;
-	int fd = open(av[1], O_RDONLY);
+	fd = open(av[1], O_RDONLY);
 	if (fd == -1)
 	{
 		perror("open failed");
@@ -39,48 +39,24 @@ int	main(int ac, char **av)
 		allvars.height_map += 1;
 		free(line_map);
 	}
-	close(fd); // think about how can use maps to put all correct map 
+	close(fd);
 
-	/*
-	*mlx_init = this function establish a connection to correct graphical system
-	*
-	*@return (void *) hold the location of current MLX | NULL if fails
-	*@params (void)
-	*/
 	allvars.mlx = mlx_init();
 	if (!allvars.mlx)
 	{
 		printf("connection failed\n");
 		return (1);
 	}
-
-	/*
-	* mlx_new_window = this func initializing a new window 
-	*
-	*@return (void *) pointer to the window we have created
-	*@param 1: mlx location of current MLX
-	*@param 2: width of window
-	*@param 3: height of window
-	*@param 4: window title
-	*/
-	allvars.window_sx = 1920;
-	allvars.window_sy = 1000;
+	allvars.window_sx = WIN_SX;
+	allvars.window_sy = WIN_SY;
 	allvars.window = mlx_new_window(allvars.mlx, allvars.window_sx, allvars.window_sy, "DARWIN");
 	if (!allvars.window)
 	{
 		printf("can't create new window!\n");
 		return (1);
 	}
-	
-	/*
-	* mlx_new_image(); create new container (img) for rendering
-	*
-	*@return (void*) t_img  
-	*@param 1: (void *) mlx for init
-	*@param 2: width image
-	*@param 3: height image
-	*/
-	int i = 0;
+
+	i = 0;
 	while (i < 6)
 	{
 		if (i == 0)
@@ -90,19 +66,13 @@ int	main(int ac, char **av)
 		i++;
 	}
 
-	//reverse image player
-	// allvars.player.reverse_player = 1;
-	// printf("%s\n", allvars.data_img[4].addr);
-
-	// printf("%s\n", allvars.data_img[4].addr);
-	// printf("*****************************\n");
-
 	allvars.map = get_map(av[1], allvars.height_map);
 	if (!allvars.map)
 	{
 		printf("failed allocation: map\n");
 		return (1);
 	}
+
 	if (!get_player_coordinates(allvars.map, &allvars.player.player_x, &allvars.player.player_y))
 	{
 		printf("error: get player (x, y)?\n");
@@ -113,19 +83,16 @@ int	main(int ac, char **av)
 		printf("error: get exit (x, y)?\n");
 		return (1);
 	}
-	allvars.player.direction = 'R';
+
+	if (allvars.width_map / 2 >= allvars.player.player_x)
+		allvars.player.direction = 'R';
+	else
+		allvars.player.direction = 'L';
 	put_map_to_window(&allvars, allvars.player.direction);
 
-	printf("exit (%d, %d)\n", allvars.exit.exit_x, allvars.exit.exit_y);
 	mlx_key_hook(allvars.window, key_hook, &allvars);
-	//	mlx_put_image_to_window(mlx, new_win, img.img, 0, 0);
 	mlx_loop(allvars.mlx);
 	
-	/* prototype mlx_clear_window(t_xvar *xvar, t_win_list *win)
-	* 	return (int) ---> boolean maybe
-	*	params 1: mlx from mlx_init();
-	*	params 2: new_window  from mlx_new_window();
-	*/
 	return (0);
 }
 
@@ -136,8 +103,12 @@ int	key_hook(int keycode, t_allvars *vars)
 	
 	if (keycode == 'A' || keycode == 'a')
 	{
-		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == '1')
+		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == '1' && vars->player.direction == 'L')
 			return (1);
+		if (vars->player.direction == 'R')
+			vars->player.direction = 'L';
+		else
+			update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
 		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == 'E')
 		{
 			if (found_collectibles(vars->map))
@@ -149,10 +120,6 @@ int	key_hook(int keycode, t_allvars *vars)
 			}
 			return (42);
 		}
-		if (vars->player.direction == 'R')
-			vars->player.direction = 'L';
-		else
-			update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
 		put_map_to_window(vars, vars->player.direction);
 	}
 	else if (keycode == 'W' || keycode == 'w')
@@ -175,8 +142,12 @@ int	key_hook(int keycode, t_allvars *vars)
 	}
 	else if (keycode == 'D' || keycode == 'd')
 	{
-		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == '1')
+		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == '1' && vars->player.direction == 'R')
 			return (1);
+		if (vars->player.direction == 'L')
+			vars->player.direction = 'R';
+		else 
+			update_map(vars->map, &vars->player.player_x , &vars->player.player_y, keycode);
 		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == 'E')
 		{
 			if (found_collectibles(vars->map))
@@ -188,10 +159,6 @@ int	key_hook(int keycode, t_allvars *vars)
 			}
 			return (42);
 		}
-		if (vars->player.direction == 'L')
-			vars->player.direction = 'R';
-		else
-			update_map(vars->map, &vars->player.player_x , &vars->player.player_y, keycode);
 		put_map_to_window(vars, vars->player.direction);
 	}
 	else if (keycode == 'S' || keycode == 's')
