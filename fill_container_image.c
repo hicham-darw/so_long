@@ -15,7 +15,6 @@ void	fill_container_image(void *mlx,t_data_img *s_img, t_data_img *d_img, int wi
 		printf("error dst img\n");
 		return ;
 	}
-	printf("|%u|\n", *(unsigned int *)d_img->addr);
 
 	s_img->img = mlx_xpm_file_to_image(mlx, s_img->xpm_file, &s_img->xpm_width, &s_img->xpm_height);
 	s_img->addr = mlx_get_data_addr(s_img->img, &s_img->bpp, &s_img->line_length, &s_img->endian);
@@ -25,8 +24,7 @@ void	fill_container_image(void *mlx,t_data_img *s_img, t_data_img *d_img, int wi
 		printf("error dst img2\n");
 		return ;
 	}
-	printf("|%u|\n", *(unsigned int *)d_img->addr);
-
+	
 	i = 0;
 	while (i < (window_sy / height_map))
 	{
