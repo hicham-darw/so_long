@@ -27,8 +27,7 @@ int		put_map_to_window(t_allvars *vars, int direction)
 					mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[5].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
 				else
 					mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[4].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
-
-				}
+			}
 			else if (vars->map[i][j] == 'C')
 				mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[2].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
 			else if (vars->map[i][j] == 'E')
