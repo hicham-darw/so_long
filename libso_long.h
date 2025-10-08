@@ -7,6 +7,9 @@
 #include <fcntl.h>
 #include "get_next_line.h"
 
+#define WIN_SX 1000
+#define WIN_SY 1000
+
 typedef struct s_data_image
 {
 	void	*img;
