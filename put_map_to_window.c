@@ -3,7 +3,7 @@
 #include "libso_long.h"
 #include <fcntl.h>
 
-int		put_map_to_window(t_allvars *vars)
+int		put_map_to_window(t_allvars *vars, int direction)
 {
     int		i, j;
 
@@ -22,7 +22,13 @@ int		put_map_to_window(t_allvars *vars)
 			else if (vars->map[i][j] == '0')
 				mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[0].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
 			else if (vars->map[i][j] == 'P')
-				mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[4].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
+			{
+				if (direction == 'R')
+					mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[5].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
+				else
+					mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[4].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
+
+				}
 			else if (vars->map[i][j] == 'C')
 				mlx_put_image_to_window(vars->mlx, vars->window, vars->data_img[2].img, (vars->window_sx / vars->width_map) * j, (vars->window_sy / vars->height_map) * i);
 			else if (vars->map[i][j] == 'E')

@@ -17,7 +17,7 @@ char    *ft_strrev_line(char *data, unsigned int start, unsigned int last)
     return (data);
 }
 
-void    change_direction_player(t_allvars *vars)
+void    change_direction_player(t_allvars *vars, int px, int py)
 {
     int    i;
     int    j;

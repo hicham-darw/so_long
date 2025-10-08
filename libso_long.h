@@ -23,7 +23,7 @@ typedef struct s_player
 {
 	int	player_x;
 	int	player_y;
-	int reverse_player;
+	int direction;
 }t_player;
 
 typedef struct s_exit
@@ -43,19 +43,19 @@ typedef struct s_allvars
 	int	height_map;
 	t_player player;
 	t_exit exit;
-	t_data_img data_img[5];
+	t_data_img data_img[6];
 
 }t_allvars;
 
 void fill_container_image(void *mlx, t_data_img *s_img, t_data_img *d_img,  int window_sx, int window_sy, int width_map, int height_map);
 void fill_container_with_grass(void *mlx, t_data_img *floor_img, t_data_img *s_img, t_data_img *d_img, int window_sx, int window_sy, int width_map, int height_map);
 char	**get_map(char *filename, int height);
-int	put_map_to_window(t_allvars *allvars);
+int	put_map_to_window(t_allvars *allvars, int direction);
 int	get_player_coordinates(char **map, int *player_x, int *player_y);
 int	get_exit_coordinates(char **map, int *exit_x, int *exit_y);
 int	key_hook(int keycode, t_allvars *vars);
 char	**update_map(char **map, int *px, int *py, int keycode);
 int		found_collectibles(char **map);
-void	change_direction_player(t_allvars *vars);
+void	change_direction_player(t_allvars *vars, int px, int py);
 #endif
 
