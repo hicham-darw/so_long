@@ -104,22 +104,18 @@ int	key_hook(int keycode, t_allvars *vars)
 	if (keycode == 'A' || keycode == 'a')
 	{
 		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == '1' && vars->player.direction == 'L')
-			return (1);
+				return (1);
+		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == 'E' && vars->player.direction == 'L')
+		{
+			if (found_collectibles(vars->map))
+				return (1);
+			printf("*********\n*You Win*\n*********\n");
+			exit(0);
+		}
 		if (vars->player.direction == 'R')
 			vars->player.direction = 'L';
 		else
 			update_map(vars->map, &vars->player.player_x, &vars->player.player_y, keycode);
-		if (vars->map[vars->player.player_y][vars->player.player_x - 1] == 'E')
-		{
-			if (found_collectibles(vars->map))
-				return (1);
-			else
-			{
-				printf("*********\n*You Win*\n*********\n");
-				exit(0);
-			}
-			return (42);
-		}
 		put_map_to_window(vars, vars->player.direction);
 	}
 	else if (keycode == 'W' || keycode == 'w')
@@ -144,21 +140,17 @@ int	key_hook(int keycode, t_allvars *vars)
 	{
 		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == '1' && vars->player.direction == 'R')
 			return (1);
-		if (vars->player.direction == 'L')
-			vars->player.direction = 'R';
-		else 
-			update_map(vars->map, &vars->player.player_x , &vars->player.player_y, keycode);
-		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == 'E')
+		if (vars->map[vars->player.player_y][vars->player.player_x + 1] == 'E' && vars->player.direction == 'R')
 		{
 			if (found_collectibles(vars->map))
 				return (1);
-			else
-			{
-				printf("*********\n*You Win*\n*********\n");
-				exit(0);
-			}
-			return (42);
+			printf("*********\n*You Win*\n*********\n");
+			exit(0);
 		}
+		if (vars->player.direction == 'L')
+			vars->player.direction = 'R';
+		else
+			update_map(vars->map, &vars->player.player_x , &vars->player.player_y, keycode);
 		put_map_to_window(vars, vars->player.direction);
 	}
 	else if (keycode == 'S' || keycode == 's')
