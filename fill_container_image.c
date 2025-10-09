@@ -1,5 +1,5 @@
-#include <mlx.h>
 #include "libso_long.h"
+#include <mlx.h>
 #include <stdio.h>
 
 void	fill_container_image(void *mlx,t_data_img *s_img, t_data_img *d_img, int window_sx, int window_sy, int width_map, int height_map)
