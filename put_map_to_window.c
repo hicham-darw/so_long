@@ -9,8 +9,6 @@ int		put_map_to_window(t_allvars *vars, int direction)
 
 	if (!vars->map || !*vars->map)
 		return (0);
-	vars->width_map = ft_strlen(vars->map[0]);
-	vars->height_map = ft_veclen(vars->map);
 	i = 0;
 	while (vars->map[i])
 	{
