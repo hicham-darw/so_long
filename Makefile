@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 SRCS = fill_container_image.c fill_container_with_grass.c found_collectibles.c get_exit_coordinates.c \
-	get_map.c get_player_coordinates.c put_map_to_window.c update_map.c
+	get_map.c get_player_coordinates.c put_map_to_window.c update_map.c invalid_map.c found_exit.c
 OBJS = $(SRCS:.c=.o)
 LIBSO = libso_long.a
 INC = -I. -I gnl/ -I gnl/libft/includes -I minilibx-linux
