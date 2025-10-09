@@ -35,6 +35,13 @@ typedef struct s_exit
 	int	exit_y;
 }t_exit;
 
+typedef struct s_item
+{
+	int player;
+	int	exit;
+	int collectible;
+}t_item;
+
 typedef struct s_allvars
 {
 	void *mlx;
@@ -60,5 +67,8 @@ int	key_hook(int keycode, t_allvars *vars);
 char	**update_map(char **map, int *px, int *py, int keycode);
 int		found_collectibles(char **map);
 void	change_direction_player(t_allvars *vars, int px, int py);
+int		found_exit(char **map);
+int invalid_map(char **map, int px, int py);
+
 #endif
 
