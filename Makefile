@@ -22,10 +22,10 @@ all: $(NAME)
 
 clean:
 	make -C gnl/ clean
-	rm $(OBJS)
+	rm -f $(OBJS)
 fclean: clean
 	make -C gnl/ fclean
-	rm $(LIBSO)
+	rm -f $(LIBSO) $(NAME)
 re: fclean all
 
 .PHONY: all clean fclean re
